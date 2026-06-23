@@ -33,6 +33,7 @@ resource "aws_ecs_task_definition" "frontend" {
   memory = var.frontend_memory
 
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
 
@@ -92,6 +93,7 @@ resource "aws_ecs_task_definition" "backend" {
   memory = var.backend_memory
 
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
 
@@ -180,6 +182,8 @@ module "frontend_service" {
     aws_subnet.private_a.id,
     aws_subnet.private_b.id
   ]
+
+  enable_execute_command = true
 }
 
 module "backend_service" {
@@ -206,4 +210,6 @@ module "backend_service" {
     aws_subnet.private_a.id,
     aws_subnet.private_b.id
   ]
+
+  enable_execute_command = true
 }
