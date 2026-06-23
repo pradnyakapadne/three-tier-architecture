@@ -25,4 +25,8 @@ server {
 }
 EOF
 
+echo "----- GENERATED NGINX CONF -----"
+cat /etc/nginx/conf.d/default.conf
+echo "----- END NGINX CONF -----"
+
 exec "$@"
