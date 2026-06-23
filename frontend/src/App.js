@@ -27,7 +27,7 @@ function App() {
 
   return (
     <div>
-      <h1>Products Dashboard</h1>
+      <h1>Products Dashboard V1</h1>
 
       <ProductForm onAdd={addProduct} />
 
