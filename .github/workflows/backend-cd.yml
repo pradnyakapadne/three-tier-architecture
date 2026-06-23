@@ -48,7 +48,13 @@ jobs:
           aws ecs describe-task-definition \
             --task-definition ${{ secrets.BACKEND_TASK_FAMILY }} \
             --query taskDefinition \
-            > task-definition.json
+            --output json > ../task-definition.json   
+          
+      - name: Verify File
+        run: |
+            pwd
+            ls -la
+            ls -la ..
 
       - name: Update Image In Task Definition
         id: render-task-definition
