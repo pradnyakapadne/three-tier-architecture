@@ -1,0 +1,67 @@
+name: Frontend CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Image
+        run: |
+            docker build -t frontend:${GITHUB_SHA} .
+  
+      - name: Set Image URI
+        run: |
+            echo "IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.FRONTEND_ECR_REPOSITORY }}:${GITHUB_SHA}" >> $GITHUB_ENV            
+
+      - name: Tag Image
+        run: |
+            docker tag frontend:${GITHUB_SHA} $IMAGE_URI
+            
+      - name: Push Image
+        run: |
+            docker push $IMAGE_URI
+
+      - name: Download Task Definition
+        run: |
+            aws ecs describe-task-definition \
+            --task-definition ${{ secrets.FRONTEND_TASK_FAMILY }} \
+            --query taskDefinition > task-definition.json
+
+      - name: Update Image
+        id: render-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: frontend
+          image: ${{ env.IMAGE_URI }}
+
+      - name: Deploy ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
+          service: ${{ secrets.FRONTEND_SERVICE_NAME }}
+          cluster: ${{ secrets.ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true

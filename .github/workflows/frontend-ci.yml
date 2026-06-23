@@ -1,0 +1,37 @@
+name: Frontend CI
+
+on:
+
+  pull_request:
+    paths:
+      - "frontend/**"
+
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    uses: ./.github/workflows/reusable-build.yml
+
+  frontend-test:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+
+      - run: npm run build
+
+      - run: docker build -t frontend:test .
