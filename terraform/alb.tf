@@ -41,4 +41,6 @@ module "internal_alb" {
     aws_subnet.private_a.id,
     aws_subnet.private_b.id
   ]
+  
+  health_path = "/health"
 }

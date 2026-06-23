@@ -25,7 +25,7 @@ resource "aws_lb_target_group" "this" {
 
   health_check {
 
-    path = "/"
+    path = var.health_path
 
     protocol = "HTTP"
 
