@@ -15,6 +15,6 @@ variable "container_name" {}
 variable "container_port" {}
 
 variable "enable_execute_command" {
-	type    = bool
-	default = false
+  type    = bool
+  default = false
 }

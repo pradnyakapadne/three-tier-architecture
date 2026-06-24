@@ -11,6 +11,6 @@ variable "vpc_id" {}
 variable "target_port" {}
 
 variable "health_path" {
-	type    = string
-	default = "/"
+  type    = string
+  default = "/"
 }

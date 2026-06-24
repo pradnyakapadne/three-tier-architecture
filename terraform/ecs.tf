@@ -175,7 +175,7 @@ module "frontend_service" {
   container_port = 80
 
   security_groups = [
-    aws_security_group.frontend_ecs_sg.id
+    aws_security_group.this["frontend_ecs"].id
   ]
 
   subnets = [
@@ -203,7 +203,7 @@ module "backend_service" {
   container_port = 8000
 
   security_groups = [
-    aws_security_group.backend_ecs_sg.id
+    aws_security_group.this["backend_ecs"].id
   ]
 
   subnets = [

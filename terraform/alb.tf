@@ -1,46 +1,52 @@
-# public/internal alb
-module "public_alb" {
+############################
+# Public ALB (Frontend)
+############################
 
+module "public_alb" {
   source = "./modules/alb"
 
-  name = "${var.project_name}-public"
-
+  name     = "${var.project_name}-public"
   internal = false
+  vpc_id   = aws_vpc.main.id
 
-  vpc_id = aws_vpc.main.id
-
+  # frontend traffic
   target_port = 80
 
   security_groups = [
-    aws_security_group.public_alb_sg.id
+    aws_security_group.this["public_alb"].id
   ]
 
   subnets = [
     aws_subnet.public_a.id,
     aws_subnet.public_b.id
   ]
+
+
+  health_path = "/"
 }
 
-module "internal_alb" {
+############################
+# Internal ALB (Backend)
+############################
 
+module "internal_alb" {
   source = "./modules/alb"
 
-  name = "${var.project_name}-internal"
-
+  name     = "${var.project_name}-internal"
   internal = true
+  vpc_id   = aws_vpc.main.id
 
-  vpc_id = aws_vpc.main.id
-
-  target_port = 8000
+  # backend traffic
+  target_port = 8000 # KEEP AS REQUESTED
 
   security_groups = [
-    aws_security_group.internal_alb_sg.id
+    aws_security_group.this["internal_alb"].id
   ]
 
   subnets = [
     aws_subnet.private_a.id,
     aws_subnet.private_b.id
   ]
-  
+
   health_path = "/health"
 }
